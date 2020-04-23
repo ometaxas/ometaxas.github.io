@@ -57,7 +57,7 @@ def export_tw(experimentid):
         cur = connection.cursor()
         
         
-        query = (""" select topicid,  string_agg(concept, ','::text), string_agg(weightedcounts::text, ','::text)
+        query = ("""select topicid,  replace(string_agg(concept, ','::text),' ','_') as concepts, string_agg(weightedcounts::text, ','::text)
                  from topicanalysis_view_covid19 group by topicid  """).format(experimentid)
 
         cur.execute(query)
@@ -121,11 +121,11 @@ def export_dt(experimentid):
         cur = connection.cursor()
         
         
-        query = ("""select topicid, pubid, weight 
+        query = ("""select distinct topicid, id, round(1000 * weight) as weight 
 from doc_topic 
-join covid19doc on doc_topic.docid = covid19doc.docid
-where experimentid = '{}'
-order by topicid """).format(experimentid)
+join covid19doc_view on doc_topic.docid = covid19doc_view.docid
+where experimentid = '{}' 
+order by topicid, id """).format(experimentid)
 
         cur.execute(query)
 
@@ -137,6 +137,7 @@ order by topicid """).format(experimentid)
             if row[0] != curtopic:
                 curtopic = row[0]
                 p.append(p_cur)
+                print(curtopic)
             i.append(int(row[1]))
             x.append(float(row[2]))
             p_cur += 1
@@ -164,7 +165,7 @@ order by topicid """).format(experimentid)
 
 if __name__=="__main__":
     import sys
-    experimentid = 'Covid_40T_550IT_3000CHRs_3M_WVNoNet'
-    #export_tw(experimentid)
+    experimentid = 'Covid_50T_550IT_3000CHRs_4M_WVNoNet'
+    export_tw(experimentid)
     export_dt(experimentid)
 
