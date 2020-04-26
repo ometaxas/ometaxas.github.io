@@ -203,9 +203,9 @@ bib.dfr = function (spec) {
 
     // provide url method
     that.url = function (doc) {
-        return "http://www.jstor.org"
-            + "/stable/"
-            + doc.doi;
+        return  "https://dx.doi.org/"            
+        + doc.doi;
+            
     };
 
     return that;

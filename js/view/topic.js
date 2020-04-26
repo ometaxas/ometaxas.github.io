@@ -33,9 +33,9 @@ view.topic.words = function (words) {
         .append("a");
 
     trs.select("td.topic_word a")
-        .attr("href", function (w) {
-            return view.dfb().view_link({ type:"word", param: +w.word });
-        })
+      // .attr("href", function (w) {
+      //      return view.dfb().view_link({ type:"word", param: +w.word });
+      //  })
         .text(function (w) { return w.word; });
 
     view.weight_tds({
