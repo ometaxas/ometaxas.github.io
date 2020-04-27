@@ -202,7 +202,7 @@
   <div id="about_view" class="hidden">
     <div id="meta_info"></div>
     <div id="about_browser">
-      <p>Model-browser interface by <a class="external" href="http://andrewgoldstone.com">Andrew Goldstone</a>; source available on <a class="external" href="http://agoldst.github.io/dfr-browser/">github</a>. Made using <a class="external" href="http://d3js.org">d3.js</a> and <a class="external" href="http://getbootstrap.com/">Bootstrap</a>. Zip support using <a class="external" href="http://stuk.github.io/jszip/">JSZip</a>.</p>
+      <p>SciTopic model browser interface for <a class="external" href=" https://www.semanticscholar.org/cord19/download">Covid-19 open research corpus</a> analysis. Source & data available on <a class="external" href="https://github.com/ometaxas/ometaxas.github.io">Github</a>; Built on top of <a class="external" href="http://agoldst.github.io/dfr-browser/">dfr-browser</a> using <a class="external" href="http://d3js.org">d3.js</a> and <a class="external" href="http://getbootstrap.com/">Bootstrap</a>. Zip support using <a class="external" href="http://stuk.github.io/jszip/">JSZip</a>.</p>
     </div>
   </div>
 
@@ -223,12 +223,12 @@
         </div>
       </div>
       <div class="row">
-        <div id="topic_words" class="col-md-3">
-          <h3 class="h-small">Top words</h3>
+        <div id="topic_words" class="col-md-4">
+          <h3 class="h-small">Top words & concepts</h3>
           <table class="table table-condensed" id="topic_words">
             <thead>
               <tr>
-                <th>Word</th>
+                <th>Word or Concept</th>
                 <th class="th-right">Weight</th>
               </tr>
             </thead>
@@ -236,7 +236,7 @@
             </tbody>
           </table>
         </div>
-        <div class="col-md-9">
+        <div class="col-md-8">
           <div id="topic_conditional">
             <h3 class="h-small">Conditional probability
               <span class="not-proper hidden">of words in topic</span>
@@ -379,8 +379,8 @@
   </div>
 
   <div id="words_view" class="hidden">
-    <h2>All words prominent in any topic</h2>
-    <p class="help">Words not prominent in any topic are not listed</p>
+    <h2>All concepts & words prominent in any topic</h2>
+    <p class="help">Concepts or words not prominent in any topic are not listed</p>
     <ul id="vocab_list" class="list-unstyled"></ul>
   </div>
 

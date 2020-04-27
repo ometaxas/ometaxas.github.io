@@ -165,7 +165,7 @@ order by topicid, id """).format(experimentid)
 
 if __name__=="__main__":
     import sys
-    experimentid = 'Covid_55T_550IT_3000CHRs_3M_WVNoNet'
+    experimentid = 'Covid_60T_550IT_3000CHRs_3M_WVNoNet'
     export_tw(experimentid)
     export_dt(experimentid)
 
