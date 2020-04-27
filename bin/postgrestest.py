@@ -58,7 +58,7 @@ def export_tw(experimentid):
         
         
         query = ("""select topicid,  replace(string_agg(concept, ','::text),' ','_') as concepts, string_agg(weightedcounts::text, ','::text)
-                 from topicanalysis_view_covid19 group by topicid  """).format(experimentid)
+                 from topicanalysis_view_covid19 where experimentid = '{}' group by topicid  """).format(experimentid)
 
         cur.execute(query)
 
@@ -165,7 +165,7 @@ order by topicid, id """).format(experimentid)
 
 if __name__=="__main__":
     import sys
-    experimentid = 'Covid_60T_550IT_3000CHRs_3M_WVNoNet'
+    experimentid = 'Covid_55T_600IT_3000CHRs_3M_WVNoNet'
     export_tw(experimentid)
     export_dt(experimentid)
 

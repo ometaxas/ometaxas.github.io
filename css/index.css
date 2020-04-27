@@ -427,11 +427,11 @@ div.bar_tooltip {
  */
 
 th#topic_docs_doc {
-    width: 50%;
+    width: 70%;
 }
 
 th#topic_docs_weight {
-    width: 40%;
+    width: 20%;
 }
 
 /* remaining 10% ad libitum */
@@ -494,8 +494,8 @@ th#topic_docs_weight {
 /* words_view */
 
 ul#vocab_list {
-    -moz-column-width: 10em;
-    -webkit-column-width: 10em;
+    -moz-column-width: 20em;
+    -webkit-column-width: 20em;
 }
 
 ul#vocab_list li a {
