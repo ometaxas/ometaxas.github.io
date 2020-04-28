@@ -167,5 +167,5 @@ if __name__=="__main__":
     import sys
     experimentid = 'Covid_55T_600IT_3000CHRs_3M_WVNoNet'
     export_tw(experimentid)
-    export_dt(experimentid)
+    #export_dt(experimentid)
 

@@ -130,16 +130,16 @@ var VIS = {
         tx_duration: 1000 // animated transition time in ms (where applicable)
     },
     word_view: {
-        n_min: 10, // words per topic
+        n_min: 15, // words per topic
         topic_label_padding: 8, // pt
         topic_label_leading: 14, // pt
-        row_height: 80, // pt
+        row_height: 150, // pt
         svg_rows: 10, // * row_height gives min. height for svg element
-        w: 700, // px: minimum width
+        w: 800, // px: minimum width
         m: {
-            left: 100,
+            left: 200,
             right: 40,
-            top: 20,
+            top: 100,
             bottom: 0
         }
     },

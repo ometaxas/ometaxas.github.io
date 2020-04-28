@@ -400,7 +400,8 @@ model = function (spec) {
 
         for (t = 0; t < this.n(); t += 1) {
             row = this.tw(t);
-            if (row.has(word)) {
+            //if (row.has(word)) {
+              if (row.has(word)) { //approximate match 
                 word_wt = row.get(word);
                 result.push({
                     topic: t,
