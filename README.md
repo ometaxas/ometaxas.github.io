@@ -27,7 +27,9 @@ Our analysis has been based on the following steps:
     - Topics per document or other entities
     - Vector representations per topics or other entities 
     - Analyze trends & similarities 
-    - Create / adapt an exploration Web GUI
+    - Create a WEB GUI for data exploration (adapting [agoldst.github.io/dfr-browser](http://agoldst.github.io/dfr-browser))
+    - Give titles to the topics
+    
 
 There are several things that we can do on top (or that they aren't properly addressed through this visualization) especially in relation to search & recommendation, such as: 
 - identify and analyze similarities among topics, concepts or documents
