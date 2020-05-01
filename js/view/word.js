@@ -3,6 +3,7 @@
 
 view.word = function (p) {
     var div = d3.select("div#word_view"),
+        vocab = p.vocab,
         word = p.word,
         n = p.n,
         spec, row_height, width,
@@ -12,11 +13,60 @@ view.word = function (p) {
         fade_in = !p.updating,
         tx_w;
 
+        var inp = document.getElementById('concept-array'); // d3.select("input#concept-array");
+        inp.value = word; 
+        inp.setAttribute('value', word);
+
+    //autocomplete
+    AriaAutocomplete(document.getElementById('concept-array'), {
+        maxItems: 5,
+        placeholder: 'Type to search',
+        deleteOnBackspace: true,
+        maxResults: 50,
+        minLength: 0,
+        multiple: true,
+        multipleSeparator: '&',
+        source: vocab,
+        value: word
+        
+        /* source: function (query, render) {
+             var result = [];
+             var isStartingCall = this === window;
+             var value = query.toLowerCase().trim();
+             var arrToCheck = isStartingCall ? value.split('&') : [value];
+             vacab.forEach(function (entry) {
+                 var code3 = entry.toLowerCase();
+                 var addIt = false;
+                 arrToCheck.forEach(function (val) {
+                     if (code3.search(val) !== -1) {
+                         addIt = true;
+                     }
+                 });
+                 if (addIt) {
+                     result.push(entry);
+                 }
+             });
+             render(result);
+         },
+         onItemRender: function (itemData) {
+             return itemData.label + ' (' + itemData.value + ')';
+         },
+         
+ */
+    });
+
+    //var inp = document.getElementById('concept-array'); // d3.select("input#concept-array");
+    //inp.value = word; 
+    //inp.setAttribute('value', word);
+    
+
     // word form setup
     d3.select("form#word_view_form")
         .on("submit", function () {
             d3.event.preventDefault();
-            var input_word = d3.select("input#word_input")
+
+            //var input_word = d3.select("input#word_input")
+            var input_word = d3.select("input#concept-array")
                 .property("value")
                 .toLowerCase();
             view.dfb().set_view({
@@ -30,9 +80,13 @@ view.word = function (p) {
         return;
     }
 
+
+    
+
     div.selectAll("#word_view span.word") // sets header and help
         .text(word);
 
+    
     div.selectAll("#word_view .none").classed("hidden", p.topics.length !== 0);
     div.select("table#word_topics").classed("hidden", p.topics.length === 0);
     div.select("#word_view_explainer").classed("hidden", p.topics.length === 0);
@@ -78,7 +132,7 @@ view.word = function (p) {
     svg.attr("clip-path", "url(#word_view_clip)");
 
     gs_t = svg.selectAll("g.topic")
-        .data(p.topics, function (t) { return t.id; } );
+        .data(p.topics, function (t) { return t.id; });
 
     // transition: update only
     gs_t.transition().duration(1000)
@@ -102,7 +156,7 @@ view.word = function (p) {
     gs_t.exit().transition()
         .duration(2000)
         .attr("transform", "translate(0," +
-                row_height * (n + gs_t.exit().size()) + ")")
+            row_height * (n + gs_t.exit().size()) + ")")
         .remove();
 
     gs_t_enter.append("rect")
@@ -204,7 +258,7 @@ view.word = function (p) {
         return "translate(" + scale_x(j) + ",-" + row_height / 2 + ")";
     })
         .attr("opacity", fade_in ? 0 : 1);
-        // pre-empting fade-in on first load or refresh
+    // pre-empting fade-in on first load or refresh
 
     // update g positions for word/bars
     tx_w = gs_w.transition()

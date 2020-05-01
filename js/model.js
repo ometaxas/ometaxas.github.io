@@ -10,8 +10,8 @@ var model;
 // meta: object holding document citations
 
 model = function (spec) {
-    var my = spec || { }, // private members
-        that = { }, // resultant object
+    var my = spec || {}, // private members
+        that = {}, // resultant object
         ready, // accessors and pseudo-accessors
         n_docs,
         topic_id,
@@ -43,7 +43,7 @@ model = function (spec) {
         set_tw,
         set_topic_scaled;
 
-    my.ready = { };
+    my.ready = {};
     my.worker = new Worker("js/worker.js");
     my.worker.fs = d3.map();
     my.worker.onmessage = function (e) {
@@ -62,7 +62,7 @@ model = function (spec) {
             result = my.n_docs;
         } else if (my.meta) {
             result = my.meta.n_docs();
-        } 
+        }
 
         return result; // undefined if my.meta is missing
     };
@@ -139,7 +139,7 @@ model = function (spec) {
                 callback(tot);
             });
             my.worker.postMessage({ what: "total_tokens" });
-        } else { 
+        } else {
             callback(my.total_tokens);
         }
     };
@@ -331,8 +331,8 @@ model = function (spec) {
     // Like topic docs, but restrict to docs with v == key
     topic_docs_conditional = function (t, v, key, n, callback) {
         my.worker.callback(
-                ["topic_docs_conditional", t, v, key, n].join("/"),
-                callback);
+            ["topic_docs_conditional", t, v, key, n].join("/"),
+            callback);
         my.worker.postMessage({
             what: "topic_docs_conditional",
             t: t,
@@ -366,7 +366,7 @@ model = function (spec) {
                 return that.topic_words(topic, n);
             });
         }
-        
+
         words = this.tw(t).entries(); // d3.map method
         words.sort(function (w1, w2) {
             return d3.descending(w1.value, w2.value) ||
@@ -398,16 +398,20 @@ model = function (spec) {
                     0);
             };
 
+        var ww = word.split("&"), i;
         for (t = 0; t < this.n(); t += 1) {
             row = this.tw(t);
-            //if (row.has(word)) {
-              if (row.has(word)) { //approximate match 
-                word_wt = row.get(word);
-                result.push({
-                    topic: t,
-                    rank: calc_rank(row)
-                });
-            }
+
+            for (i = 0; i < ww.length; i++) {
+                if (row.has(ww[i])) {
+                    word_wt = row.get(ww[i]);
+                    result.push({
+                        topic: t,
+                        rank: calc_rank(row)
+                    });
+                }
+            };
+
         }
         result.sort(function (a, b) {
             return d3.ascending(a.rank, b.rank) ||
@@ -417,6 +421,7 @@ model = function (spec) {
             return topics[i].rank;
         });
     };
+
     that.word_topics = word_topics;
 
     topic_label = function (t) {
@@ -465,7 +470,7 @@ model = function (spec) {
         my.tw = parsed.tw.map(function (topic) {
             var result = d3.map();
             topic.words.map(function (w, j) {
-                result.set(w, topic.weights[j]);
+                result.set( w.toLowerCase(), topic.weights[j]);
             });
             return result;
         });
@@ -480,7 +485,7 @@ model = function (spec) {
     // load dt from a string of JSON
     // callback should take one parameter, a Boolean indicating success
     set_dt = function (dt_s, callback) {
-        if (typeof dt_s  !== 'string') {
+        if (typeof dt_s !== 'string') {
             callback(false);
         }
 
@@ -499,7 +504,7 @@ model = function (spec) {
     // load scaled topic coordinates from a string of CSV lines
     set_topic_scaled = function (ts_s) {
         var s;
-        if (typeof ts_s  === 'string') {
+        if (typeof ts_s === 'string') {
             // strip blank "rows" at start or end
             s = ts_s.replace(/^\n*/, "")
                 .replace(/\n*$/, "\n");

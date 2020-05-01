@@ -168,6 +168,7 @@ var dfb = function(spec) {
     my.views.set("word", function(w) {
         var div = d3.select("div#word_view"),
             h,
+            ts,
             word = w,
             topics, n = 0;
 
@@ -176,6 +177,11 @@ var dfb = function(spec) {
             return true;
         }
         view.loading(false);
+
+        if (!my.settings.show_hidden_topics) {
+            ts = d3.range(my.m.n())
+                .filter(function (t) { return !topic_hidden(t); });
+        }
 
         if (word) {
             div.select("#word_view_help").classed("hidden", true);
@@ -216,6 +222,7 @@ var dfb = function(spec) {
         n = Math.max(VIS.word_view.n_min, n);
 
         view.word({
+            vocab:my.m.vocab(ts),
             word: word,
             topics: topics.map(function(t) {
                 return {
