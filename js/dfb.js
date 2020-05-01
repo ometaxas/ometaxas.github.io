@@ -196,7 +196,10 @@ var dfb = function(spec) {
                 div.select("#last_word_help").classed("hidden", false);
             } else {
                 div.select("#word_view_main").classed("hidden", true);
-                view.word({ word: undefined });
+                view.word({ 
+                    vocab:my.m.vocab(ts),
+                    word: undefined 
+                });
                 return true;
             }
         }
@@ -220,7 +223,7 @@ var dfb = function(spec) {
         }
         // but not too few words. Also take care of topics.length = 0 case
         n = Math.max(VIS.word_view.n_min, n);
-
+        
         view.word({
             vocab:my.m.vocab(ts),
             word: word,
@@ -237,7 +240,7 @@ var dfb = function(spec) {
             n_topics: my.m.n(),
             updating: my.updating
         });
-
+    
         return word ? [word] : [];
     });
 
