@@ -15,6 +15,7 @@ The analysis has been based on [SciTopic](https://github.com/atypon/MVTopicModel
 The visualization has been based on [agoldst.github.io/dfr-browser](http://agoldst.github.io/dfr-browser), use [d3](http://d3js.org) and it relies entirely on static html and javascript files. We have created a python scipt which analyzes the results of SciTopic and exports required data files in a format which is compatible with dfrbrowser. To better support the requirements of Scitopic & Covid-19 dataset we have implemented several changes on top of the dfrbrowser such as:
 - Change the way we are calculating trends and more specifically the normalization: topic activity per year is based on the ratio of the docs of a topic in a given year / total docs for a given topic (and total docs of all topics for a given year)  
 - Change html / CSS in several places to handle longer 'word' descriptions (which correspond to concepts)
+- Support autocomplete & multi-selection in word & concept search 
 
 
 Our analysis has been based on the following steps:
