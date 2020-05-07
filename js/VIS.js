@@ -8,7 +8,7 @@ var VIS = {
         meta: "data/meta.csv.zip",  // remove .zip to use uncompressed data
         dt: "data/dt.json.zip",     // (name the actual file accordingly)
         tw: "data/tw.json",
-        topic_scaled: "data/topic_scaled.csv"
+        topic_scaled: "data/graph.json"
     },
     aliases: {                  // simple aliasing in URLs:
         yearly: "conditional"   // #/model/yearly/... -> #/model/conditional/...
@@ -36,7 +36,7 @@ var VIS = {
     model_view: {
         plot: {
             w: 500,            // px: the minimum svg width
-            aspect: 1.3333,     // for calculating height
+            aspect: 1.4, //.3333,     // for calculating height
             words: 6,           // maximum: may need adjustment
             size_range: [7, 18], // points. may need adjustment
             name_size: 18,      // points
@@ -46,9 +46,13 @@ var VIS = {
             //                  // (must sum to # of topics)
             // indents: [ 0.5, 0, 0.5 ] // AND/OR: x origin of each row
         },
+        relations: {
+            w: 500,         // px: the minimum svg width
+            aspect: 1.333          
+        },
         conditional: {
             w: 500,         // px: the minimum svg width
-            aspect: 1.333,
+            aspect: 1.4,//333,
             m: {
                 left: 20,
                 right: 20,
@@ -58,7 +62,7 @@ var VIS = {
             label_threshold: 40, // px
             words: 4,
             label_words: 2, // should be <= words
-            streamgraph: true,   // streamgraph or stack areas from x-axis?
+            streamgraph: false,   // streamgraph or stack areas from x-axis?
             ordinal: {          // ordinal variable: stacked bars, not areas
                 bar: 0.4        // bar width as proportion
             }

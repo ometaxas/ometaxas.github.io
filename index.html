@@ -4,8 +4,13 @@
 <head>
   <meta charset="utf-8">
   <title>Topic Model Browser</title>
-  <script type="text/javascript" src="lib/d3.min.js"></script>
-
+  
+  <script type="text/javascript" src="lib/d3.v5.min.js"></script>
+  <script>
+    var d3v5 = window.d3;
+    window.d3 = null;
+  </script>
+  <script type="text/javascript" src="lib/d3.min.js"></script> 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="css/bootstrap.min.css" media="screen">
 
@@ -119,25 +124,28 @@
             <a href="#/model/grid">Grid</a>
           </li>
           <li id="nav_model_scaled">
-            <a href="#/model/scaled">Scaled</a>
+            <a href="#/model/scaled">Relations</a>
           </li>
           <li id="nav_model_list">
             <a href="#/model/list">List</a>
           </li>
           <li id="nav_model_conditional">
-            <a href="#/model/conditional">Stacked</a>
-          </li>
+            <a href="#/model/conditional">Trends</a>
+          </li>          
         </ul>
         <div class="navbar-right">
           <p class="navbar-text help model_view_grid hidden">
             click a circle for more about a topic
           </p>
           <p id="model_view_help"
-          class="navbar-text help model_view_scaled model_view_conditional hidden">
+          class="navbar-text help  model_view_conditional  hidden">
           scroll to zoom; shift-drag to pan; click for more about a topic</p>
           <p id="list_view_help"
           class="navbar-text help model_view_list hidden">
           click a column label to sort; click a row for more about a topic</p>
+          <p id="list_view_help"
+          class="navbar-text help model_view_scaled hidden">
+          scroll to zoom; drag to pan; hoover to highlight relations; click for more about a topic</p>
           <p id="conditional_view_help" class="navbar-text help model_view_conditional hidden"> y-axis: </p>
           <ul id="conditional_choice"
             class="nav navbar-nav nav-pills model_view_conditional hidden">
@@ -156,7 +164,7 @@
           </ul>
           <button id="reset_zoom" type="button"
             class="btn btn-default navbar-btn
-              model_view_scaled model_view_conditional hidden">
+              model_view_conditional model_view_scaled hidden">
             Reset zoom
           </button>
         </div>
@@ -195,6 +203,8 @@
       </table>
     </div>
     <div id="model_view_plot" class="hidden">
+    </div>
+    <div id="model_view_scaled" class="hidden">
     </div>
     <div id="model_view_conditional" class="hidden">
     </div>
@@ -418,7 +428,8 @@
 	<script type="text/javascript" src="js/view/word.js"></script>	
 	<script type="text/javascript" src="js/view/words.js"></script>	
 	<script type="text/javascript" src="js/view/model.js"></script>	
-	<script type="text/javascript" src="js/view/model_conditional.js"></script>	
+  <script type="text/javascript" src="js/view/model_conditional.js"></script>	
+  <script type="text/javascript" src="js/view/model_relations.js"></script>	
 	<script type="text/javascript" src="js/view/model_list.js"></script>	
 	<script type="text/javascript" src="js/view/model_plot.js"></script>	
 	<script type="text/javascript" src="js/metadata.js"></script>    

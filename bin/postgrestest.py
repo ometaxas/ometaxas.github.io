@@ -162,10 +162,105 @@ order by topicid, id """).format(experimentid)
             connection.close()
             print("PostgreSQL connection is closed")
 
+def write_tsgraph(nodes, links, out):
+    tsj = {
+        "links": links,
+        "nodes": nodes
+    }
+    with open(out, "w") as f:
+        json.dump(tsj, f)
+
+    print("Wrote topic similarity graph information to " + f.name)
+    
+def export_topicsilimarity(experimentid):
+    """ query data from the vendors table """
+    connection = None
+    
+    try:
+        
+        
+        links = []
+        
+
+        connection = psycopg2.connect(user = "postgres",
+                                  password = "postgres",
+                                  host = "localhost",
+                                  port = "5432",
+                                  database = "DBLP")
+        cur = connection.cursor()
+        
+        
+        query = ("""select topicid1, topicid2, similarity
+FROM topicsimilarity 
+WHERE experimentid1 = '{}' and similarity >= 0.3   order by topicid1, topicid2""").format(experimentid)
+
+        cur.execute(query)
+
+        print("The number of similar topic pairs: ", cur.rowcount)
+        rows = cur.fetchall()
+        
+ 
+        for row in rows:  
+             links.append({
+            "source": row[0],            
+            "target": row[1],
+            "value": float(row[2])
+            })
+
+            
+        print(links)    
+ 
+        cur.close()   
+        
+        nodes = []
+
+        cur = connection.cursor()
+                
+        query = ("""select topicid, title, weight 
+        from topic 
+        inner join topicdetails on topic.id = topicdetails.topicid
+        where topic.experimentid = '{}' and visibilityindex>0  and itemtype=0 and topic.experimentid = topicdetails.experimentid
+        order by topicid """).format(experimentid)
+
+        cur.execute(query)
+
+        print("The number of topics: ", cur.rowcount)
+        rows = cur.fetchall()
+ 
+        #{"size": 60, "score": 0, "id": "Androsynth", "type": "circle"},
+        for row in rows:
+            nodes.append({
+            "size": int(700*row[2]),            
+            "title": row[1],
+            "score":1,
+            "id": row[0],
+            "group": 1
+            })
+            
+            
+        print(nodes)    
+ 
+        cur.close()
+
+
+        out = "graph.json"
+        write_tsgraph(nodes,links,out) 
+        
+
+    except (Exception, psycopg2.Error) as error :
+        print ("Error while connecting to PostgreSQL", error)
+    finally:
+        #closing database connection.
+        if(connection):
+            cur.close()
+            connection.close()
+            print("PostgreSQL connection is closed")
+
 
 if __name__=="__main__":
     import sys
     experimentid = 'Covid_55T_600IT_3000CHRs_3M_WVNoNet'
-    export_tw(experimentid)
+    #export_tw(experimentid)
     #export_dt(experimentid)
+    export_topicsilimarity(experimentid)
 

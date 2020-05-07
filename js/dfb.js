@@ -1,7 +1,7 @@
 /*global d3, $, JSZip, utils, model, view, bib, metadata, VIS, window, document */
 "use strict";
 
-var dfb = function(spec) {
+var dfb = function (spec) {
     var my = spec || {},
         that = {},
         settings_modal,
@@ -9,6 +9,7 @@ var dfb = function(spec) {
         model_view_list, // helper functions for model subviews
         model_view_plot,
         model_view_conditional,
+        model_view_scaled,
         refresh,
         set_view, // public methods:  for changing views
         view_hash, //                  for getting a link to a view
@@ -64,7 +65,7 @@ var dfb = function(spec) {
     my.shared = {
         models: d3.map(),
         meta: d3.map(),
-        model_key: function(fs) {
+        model_key: function (fs) {
             return fs.dt + ">>>" + fs.tw + ">>>" + fs.topic_scaled;
         }
     };
@@ -72,7 +73,7 @@ var dfb = function(spec) {
     // Principal view-generating functions
     // -----------------------------------
 
-    my.views.set("topic", function(t_id, y) {
+    my.views.set("topic", function (t_id, y) {
         var words, t,
             view_top_docs;
 
@@ -114,7 +115,7 @@ var dfb = function(spec) {
         }
 
         // topic conditional barplot subview
-        my.m.topic_conditional(t, my.condition.field, function(data) {
+        my.m.topic_conditional(t, my.condition.field, function (data) {
             view.topic.conditional({
                 t: t_id,
                 condition: data.has(y) ? y : undefined, // validate condition y
@@ -129,8 +130,8 @@ var dfb = function(spec) {
         });
 
         // create callback for showing top docs; used in if/else following
-        view_top_docs = function(docs) {
-            var doc_ids = docs.map(function(d) {
+        view_top_docs = function (docs) {
+            var doc_ids = docs.map(function (d) {
                 return my.m.meta().doc_id(d.doc);
             });
             view.calculating("#topic_docs", false);
@@ -138,7 +139,7 @@ var dfb = function(spec) {
                 t: my.m.topic_id(t),
                 docs: docs,
                 doc_ids: doc_ids,
-                citations: my.m.meta().doc(doc_ids).map(function(d) {
+                citations: my.m.meta().doc(doc_ids).map(function (d) {
                     return my.m.bib().citation(d);
                 }),
                 condition: y,
@@ -165,7 +166,7 @@ var dfb = function(spec) {
         return (y === undefined) ? [t_id] : [t_id, y];
     });
 
-    my.views.set("word", function(w) {
+    my.views.set("word", function (w) {
         var div = d3.select("div#word_view"),
             h,
             ts,
@@ -196,9 +197,9 @@ var dfb = function(spec) {
                 div.select("#last_word_help").classed("hidden", false);
             } else {
                 div.select("#word_view_main").classed("hidden", true);
-                view.word({ 
-                    vocab:my.m.vocab(ts),
-                    word: undefined 
+                view.word({
+                    vocab: my.m.vocab(ts),
+                    word: undefined
                 });
                 return true;
             }
@@ -208,26 +209,26 @@ var dfb = function(spec) {
         my.updating = word === my.last.word;
         my.last.word = word;
 
-        topics = my.m.word_topics(word).filter(function(t) {
+        topics = my.m.word_topics(word).filter(function (t) {
             return !topic_hidden(t.topic);
         });
 
         if (topics.length > 0) {
-            n = 1 + d3.max(topics, function(t) {
+            n = 1 + d3.max(topics, function (t) {
                 return t.rank; // 0-based, so we rank + 1
             });
             // count words per row, taking account of possible ties
-            n = d3.max(topics, function(t) {
+            n = d3.max(topics, function (t) {
                 return my.m.topic_words(t.topic, n).length;
             });
         }
         // but not too few words. Also take care of topics.length = 0 case
         n = Math.max(VIS.word_view.n_min, n);
-        
+
         view.word({
-            vocab:my.m.vocab(ts),
+            vocab: my.m.vocab(ts),
             word: word,
-            topics: topics.map(function(t) {
+            topics: topics.map(function (t) {
                 return {
                     t: t.topic,
                     id: my.m.topic_id(t.topic),
@@ -240,11 +241,11 @@ var dfb = function(spec) {
             n_topics: my.m.n(),
             updating: my.updating
         });
-    
+
         return word ? [word] : [];
     });
 
-    my.views.set("words", function() {
+    my.views.set("words", function () {
         var ts;
         if (!my.m.ready("tw")) {
             view.loading(true);
@@ -254,7 +255,7 @@ var dfb = function(spec) {
 
         if (!my.settings.show_hidden_topics) {
             ts = d3.range(my.m.n())
-                .filter(function(t) { return !topic_hidden(t); });
+                .filter(function (t) { return !topic_hidden(t); });
         }
         // if we are revealing hidden topics, ts can be undefined
         // and m.vocab(ts) will return the full vocab.
@@ -262,7 +263,7 @@ var dfb = function(spec) {
         return view.words(my.m.vocab(ts));
     });
 
-    my.views.set("doc", function(doc) {
+    my.views.set("doc", function (doc) {
         var div = d3.select("div#doc_view"),
             d, h, meta;
 
@@ -306,8 +307,8 @@ var dfb = function(spec) {
         d3.select("#doc_view_main").classed("hidden", false);
 
         view.calculating("#doc_view", true);
-        my.m.doc_topics(d, my.m.n(), function(ts) {
-            var topics = ts.filter(function(t) {
+        my.m.doc_topics(d, my.m.n(), function (ts) {
+            var topics = ts.filter(function (t) {
                 return !topic_hidden(t.topic);
             });
 
@@ -317,14 +318,14 @@ var dfb = function(spec) {
                 topics: topics,
                 citation: my.m.bib().citation(meta),
                 url: my.m.bib().url(meta),
-                total_tokens: d3.sum(topics, function(t) { return t.weight; }),
-                words: topics.map(function(t) {
+                total_tokens: d3.sum(topics, function (t) { return t.weight; }),
+                words: topics.map(function (t) {
                     return my.m.topic_words(t.topic, my.settings.overview_words);
                 }),
-                labels: topics.map(function(t) {
+                labels: topics.map(function (t) {
                     return my.m.topic_label(t.topic);
                 }),
-                ids: topics.map(function(t) {
+                ids: topics.map(function (t) {
                     return my.m.topic_id(t.topic);
                 }),
                 proper: my.proper
@@ -338,12 +339,12 @@ var dfb = function(spec) {
         // TODO nearby documents list
     });
 
-    my.views.set("bib", function(maj, min, dir) {
+    my.views.set("bib", function (maj, min, dir) {
         var sorting = {
-                major: maj,
-                minor: min,
-                dir: dir
-            },
+            major: maj,
+            minor: min,
+            dir: dir
+        },
             ordering;
 
         if (!my.m.ready("meta")) {
@@ -381,7 +382,7 @@ var dfb = function(spec) {
         if (!my.cache.citations) {
             // Cache the list of citations
             my.cache.citations = d3.map();
-            my.m.meta().doc().forEach(function(d, j) {
+            my.m.meta().doc().forEach(function (d, j) {
                 my.cache.citations.set(my.m.meta().doc_id(j),
                     my.m.bib().citation(d));
             });
@@ -401,7 +402,7 @@ var dfb = function(spec) {
         return [sorting.major, sorting.minor, sorting.dir];
     });
 
-    my.views.set("about", function() {
+    my.views.set("about", function () {
         view.about({
             meta_info: my.meta_info
         });
@@ -409,7 +410,7 @@ var dfb = function(spec) {
         return true;
     });
 
-    settings_modal = function() {
+    settings_modal = function () {
         var p = {
             max_words: my.m.n_top_words(),
             max_docs: my.m.n_docs(),
@@ -435,12 +436,12 @@ var dfb = function(spec) {
     };
     that.settings_modal = settings_modal;
 
-    update_settings = function(s) {
+    update_settings = function (s) {
         my.settings = utils.deep_replace(my.settings, s, true);
     };
     that.update_settings = update_settings;
 
-    my.views.set("model", function(type, p1, p2) {
+    my.views.set("model", function (type, p1, p2) {
         var type_chosen = type || my.last.model || "grid";
 
         // validate type, default to grid
@@ -469,11 +470,13 @@ var dfb = function(spec) {
             d3.select("#model_view_plot").classed("hidden", true);
             d3.select("#model_view_list").classed("hidden", true);
             d3.select("#model_view_conditional").classed("hidden", true);
+            d3.select("#model_view_scaled").classed("hidden", true);
 
             d3.selectAll(".model_view_grid").classed("hidden", true);
             d3.selectAll(".model_view_scaled").classed("hidden", true);
             d3.selectAll(".model_view_list").classed("hidden", true);
             d3.selectAll(".model_view_conditional").classed("hidden", true);
+
         }
 
         // reveal navbar
@@ -497,20 +500,27 @@ var dfb = function(spec) {
 
             model_view_conditional(p1);
             d3.select("#model_view_conditional").classed("hidden", false);
-        } else { // grid or scaled
-            // if loading scaled coordinates failed,
-            // we expect m.topic_scaled() to be defined but empty
+        }
+        else if (type_chosen === "scaled") {
+            // my.m.topic_scaled().length !== my.m.n()) ?? do I need it?
             if (!my.m.ready("topic_scaled") || !my.m.ready("dt")) {
                 view.loading(true);
                 return true;
             }
 
-            if (type_chosen !== "scaled" ||
-                my.m.topic_scaled().length !== my.m.n()) {
-                // default to grid if there are no scaled coords to be found
-                // or if type is misspecified
-                type_chosen = "grid";
+            model_view_scaled();
+            d3.select("#model_view_scaled").classed("hidden", false);
+        }
+
+        else { // grid 
+
+
+            if (!my.m.ready("dt")) {
+                view.loading(true);
+                return true;
             }
+            type_chosen = "grid";
+
             model_view_plot(type_chosen);
             d3.select("#model_view_plot").classed("hidden", false);
         }
@@ -524,7 +534,7 @@ var dfb = function(spec) {
         return [type_chosen];
     });
 
-    model_view_list = function(sort, dir) {
+    model_view_list = function (sort, dir) {
         var sort_choice, sort_dir;
 
         // TODO fix hide-show flicker when re-sorting or model-switching
@@ -537,9 +547,9 @@ var dfb = function(spec) {
         my.last.model_list.sort = sort_choice;
         my.last.model_list.dir = sort_dir;
 
-        my.m.topic_total(undefined, function(sums) {
+        my.m.topic_total(undefined, function (sums) {
             my.m.topic_conditional(undefined, my.condition.field,
-                function(data) {
+                function (data) {
                     view.calculating("#model_view_list", false);
                     view.model.list({
                         data: data,
@@ -553,7 +563,7 @@ var dfb = function(spec) {
                         dir: sort_dir,
                         labels: d3.range(my.m.n()).map(my.m.topic_label),
                         ids: d3.range(my.m.n()).map(my.m.topic_id),
-                        topic_hidden: data.map(function(d) {
+                        topic_hidden: data.map(function (d) {
                             return topic_hidden(d.t);
                         })
                     });
@@ -565,14 +575,14 @@ var dfb = function(spec) {
         return true;
     };
 
-    model_view_plot = function(type) {
-        my.m.topic_total(undefined, function(totals) {
+    model_view_plot = function (type) {
+        my.m.topic_total(undefined, function (totals) {
             var topics = d3.range(my.m.n())
-                .filter(function(t) { return !topic_hidden(t); });
+                .filter(function (t) { return !topic_hidden(t); });
 
             view.model.plot({
                 type: type,
-                topics: topics.map(function(t) {
+                topics: topics.map(function (t) {
                     return {
                         t: t,
                         words: my.m.topic_words(t, VIS.model_view.plot.words),
@@ -588,7 +598,25 @@ var dfb = function(spec) {
         return true;
     };
 
-    model_view_conditional = function(type) {
+    model_view_scaled = function () {
+        view.calculating("#model_view_scaled", true);
+        my.m.topic_total(undefined, function (totals) {
+            var topics = d3.range(my.m.n())
+                .filter(function (t) { return !topic_hidden(t); });
+
+            view.model.relations({
+                graph: my.m.topic_scaled()
+            });
+            view.calculating("#model_view_scaled", false);
+
+        });
+        return true;
+    };
+
+
+
+
+    model_view_conditional = function (type) {
         var p = {
             key: my.m.meta_condition(my.condition.field),
             condition_type: my.condition.type,
@@ -602,24 +630,24 @@ var dfb = function(spec) {
         my.last.model_conditional = p.raw;
 
         view.calculating("#model_view_conditional", true);
-        my.m.conditional_total(my.condition.field, undefined, function(totals) {
+        my.m.conditional_total(my.condition.field, undefined, function (totals) {
             my.m.topic_conditional(undefined, my.condition.field,
-                function(data) {
+                function (data) {
                     p.conditional_totals = totals;
-                    p.topics = data.map(function(wts, t) {
-                            return {
-                                t: t,
-                                wts: wts,
-                                words: my.m.topic_words(t,
-                                    VIS.model_view.conditional.words
-                                ).map(function(w) {
-                                    return w.word;
-                                }),
-                                label: my.m.topic_label(t),
-                                id: my.m.topic_id(t)
-                            };
-                        })
-                        .filter(function(topic) {
+                    p.topics = data.map(function (wts, t) {
+                        return {
+                            t: t,
+                            wts: wts,
+                            words: my.m.topic_words(t,
+                                VIS.model_view.conditional.words
+                            ).map(function (w) {
+                                return w.word;
+                            }),
+                            label: my.m.topic_label(t),
+                            id: my.m.topic_id(t)
+                        };
+                    })
+                        .filter(function (topic) {
                             return !topic_hidden(topic.t);
                         });
 
@@ -631,13 +659,13 @@ var dfb = function(spec) {
         return true;
     };
 
-    refresh = function() {
+    refresh = function () {
         var hash = window.location.hash,
             v, type, param,
             success = false;
 
         if (my.aliases) {
-            my.aliases.forEach(function(pat, repl) {
+            my.aliases.forEach(function (pat, repl) {
                 hash = hash.split(pat).join(repl);
             });
         }
@@ -719,24 +747,24 @@ var dfb = function(spec) {
     // External objects can request a change in the view with this function,
     // which triggers the hashchange handler and thus a call to refresh()
 
-    set_view = function(v) {
+    set_view = function (v) {
         window.location.hash = view_hash(v);
     };
     that.set_view = set_view;
 
-    switch_model = function(id) {
+    switch_model = function (id) {
         var v = utils.clone(my.last.view);
         v.model = id;
         set_view(v);
     };
     that.switch_model = switch_model;
 
-    view_link = function(v) {
+    view_link = function (v) {
         return "#" + view_hash(v);
     };
     that.view_link = view_link;
 
-    view_hash = function(v) {
+    view_hash = function (v) {
         var result = "";
 
         if (my.models.length > 1) {
@@ -765,7 +793,7 @@ var dfb = function(spec) {
         return result;
     };
 
-    parse_hash = function(h) {
+    parse_hash = function (h) {
         var result = {},
             hh;
         if (typeof h !== "string") {
@@ -794,15 +822,15 @@ var dfb = function(spec) {
         return result;
     };
 
-    hide_topics = function(flg) {
+    hide_topics = function (flg) {
         var flag = (flg === undefined) ? !my.settings.show_hidden_topics : flg;
         d3.selectAll(".hidden_topic")
-            .classed("hidden", function() {
+            .classed("hidden", function () {
                 return flag;
             });
     };
 
-    topic_hidden = function(t) {
+    topic_hidden = function (t) {
         if (my.settings.show_hidden_topics) {
             return false;
         }
@@ -811,7 +839,7 @@ var dfb = function(spec) {
             if (!isFinite(my.m.n())) {
                 return false;
             }
-            my.cache.topic_hidden = d3.range(my.m.n()).map(function(t) {
+            my.cache.topic_hidden = d3.range(my.m.n()).map(function (t) {
                 return VIS.hidden_topics.indexOf(my.m.topic_id(t)) !== -1;
             });
         }
@@ -823,7 +851,7 @@ var dfb = function(spec) {
     // in a big way.  Right now the only use for this is for the model/conditional
     // view, which caches the result of the "stacking" calculation and needs to
     // know if we've hidden topics.
-    data_signature = function() {
+    data_signature = function () {
         return my.id + (my.settings.show_hidden_topics ? "_show" : "_hide");
     };
 
@@ -831,20 +859,20 @@ var dfb = function(spec) {
     // --------------
 
     // global visualization setup
-    setup_listeners = function(delay) {
+    setup_listeners = function (delay) {
         var resize_timer;
 
         // hashchange handler
-        window.onhashchange = function() {
+        window.onhashchange = function () {
             refresh();
         };
 
         // resizing handler
-        $(window).resize(function() {
+        $(window).resize(function () {
             if (resize_timer) {
                 window.clearTimeout(resize_timer);
             }
-            resize_timer = window.setTimeout(function() {
+            resize_timer = window.setTimeout(function () {
                 refresh();
                 resize_timer = undefined; // ha ha
             }, delay);
@@ -852,18 +880,18 @@ var dfb = function(spec) {
 
 
         // attach the settings modal to the navbar link
-        d3.select("#nav_settings a").on("click", function() {
+        d3.select("#nav_settings a").on("click", function () {
             d3.event.preventDefault();
             settings_modal();
         });
 
-        $("#settings_modal").on("hide.bs.modal", function() {
+        $("#settings_modal").on("hide.bs.modal", function () {
             refresh();
         });
 
     };
 
-    setup_views = function(default_view) {
+    setup_views = function (default_view) {
         var cur, result;
         // validate the default view
         my.default_view = parse_hash("#" + default_view);
@@ -900,7 +928,7 @@ var dfb = function(spec) {
     // ------------
 
     // general file-loading utility
-    load_data = function(target, callback) {
+    load_data = function (target, callback) {
         var target_base, dom_data;
 
         if (target === undefined) {
@@ -929,7 +957,7 @@ var dfb = function(spec) {
         if (target.search(/\.zip$/) > 0) {
             return d3.xhr(target)
                 .responseType("arraybuffer")
-                .get(function(error, response) {
+                .get(function (error, response) {
                     var zip, text;
                     if (response && response.status === 200 &&
                         response.response.byteLength) {
@@ -942,14 +970,14 @@ var dfb = function(spec) {
         }
 
         // Otherwise, no unzipping
-        return d3.text(target, function(error, s) {
+        return d3.text(target, function (error, s) {
             return callback(error, s);
         });
     };
 
     // main data-loader
-    load = function() {
-        load_data(VIS.files.info, function(error, info_s) {
+    load = function () {
+        load_data(VIS.files.info, function (error, info_s) {
             var info, id, k;
 
             // We need to know whether we got new VIS parameters before we
@@ -969,7 +997,7 @@ var dfb = function(spec) {
             my.models = info.models || [{ id: "__SINGLE__" }];
             // initialize model collection so we know what id's to recognize,
             // and fill in default file names
-            my.models.forEach(function(m) {
+            my.models.forEach(function (m) {
                 var basename;
 
                 // validate model ID: can't conflict with URL pattern
@@ -991,12 +1019,12 @@ var dfb = function(spec) {
                 }
 
                 m.files = utils.deep_replace({
-                        info: basename + "info.json",
-                        meta: basename + "meta.csv.zip",
-                        dt: basename + "dt.json.zip",
-                        tw: basename + "tw.json",
-                        topic_scaled: basename + "topic_scaled.csv"
-                    },
+                    info: basename + "info.json",
+                    meta: basename + "meta.csv.zip",
+                    dt: basename + "dt.json.zip",
+                    tw: basename + "tw.json",
+                    topic_scaled: basename + "graph.json"
+                },
                     m.files
                 );
 
@@ -1053,7 +1081,7 @@ var dfb = function(spec) {
     };
     that.load = load;
 
-    load_model = function(id, vis) {
+    load_model = function (id, vis) {
         var files, shared_m;
         if (!my.ms.has(id)) {
             view.warning("Unknown model " + id);
@@ -1069,7 +1097,7 @@ var dfb = function(spec) {
             files = vis.files;
         } else {
             // search by id for relevant file data
-            files = my.models.find(function(m) {
+            files = my.models.find(function (m) {
                 return m.id === id;
             }).files;
         }
@@ -1078,7 +1106,7 @@ var dfb = function(spec) {
             // no data loaded for this id; is it loaded under another id?
 
             shared_m = my.shared.models.get(my.shared.model_key(files))
-                .find(function(m_id) {
+                .find(function (m_id) {
                     return my.ms.get(m_id) !== undefined;
                 });
 
@@ -1097,7 +1125,7 @@ var dfb = function(spec) {
 
         // now launch remaining data loading; these will not re-request data if
         // we've already loaded this model
-        load_info(files.info, vis, function() {
+        load_info(files.info, vis, function () {
             load_meta(files.meta);
             load_dt(files.dt);
             load_tw(files.tw);
@@ -1108,8 +1136,8 @@ var dfb = function(spec) {
 
     // unlike the other data-loaders, load_info takes a callback
     // (so that we can ensure data is loaded AFTER info)
-    load_info = function(f, previs, callback) {
-        var cb = function(vis) {
+    load_info = function (f, previs, callback) {
+        var cb = function (vis) {
             // load any preferences stashed in particular model info
             // TODO segregate browser-general from model-specific settings
             // TODO better to pass VIS to views rather than have the global, duh
@@ -1137,7 +1165,7 @@ var dfb = function(spec) {
             return;
         }
 
-        load_data(f, function(error, s) {
+        load_data(f, function (error, s) {
             if (typeof s === 'string') {
                 cb(JSON.parse(s));
             } else {
@@ -1146,12 +1174,12 @@ var dfb = function(spec) {
         });
     };
 
-    load_meta = function(f) {
+    load_meta = function (f) {
         var meta, callback;
 
         // final action after metadata is retrieved / constructed:
         // store conditionining-variable information
-        callback = function(md) {
+        callback = function (md) {
             my.condition = {
                 field: VIS.condition.spec.field,
                 name: VIS.condition.name || VIS.condition.spec.field,
@@ -1173,7 +1201,7 @@ var dfb = function(spec) {
 
         // TODO determine whether we can use an already-loaded metadata object
 
-        meta = my.shared.meta.get(f).find(function(mid) {
+        meta = my.shared.meta.get(f).find(function (mid) {
             var m_share = my.ms.get(mid);
             return m_share && m_share.ready("meta");
         });
@@ -1212,7 +1240,7 @@ var dfb = function(spec) {
             view.warning("Unknown bib.type; defaulting to dfr.");
         }
 
-        load_data(f, function(error, meta_s) {
+        load_data(f, function (error, meta_s) {
             if (typeof meta_s === 'string') {
                 // and get the metadata object ready
                 meta.from_string(meta_s);
@@ -1225,8 +1253,8 @@ var dfb = function(spec) {
         });
     };
 
-    load_dt = function(f) {
-        var callback = function() {
+    load_dt = function (f) {
+        var callback = function () {
             my.proper = VIS.proper;
             if (my.proper === undefined) {
                 my.proper = my.m.proper();
@@ -1242,8 +1270,8 @@ var dfb = function(spec) {
             return;
         }
 
-        load_data(f, function(error, dt_s) {
-            my.m.set_dt(dt_s, function(result) {
+        load_data(f, function (error, dt_s) {
+            my.m.set_dt(dt_s, function (result) {
                 if (result.success) {
                     callback();
                     refresh();
@@ -1254,10 +1282,10 @@ var dfb = function(spec) {
         });
     };
 
-    load_tw = function(f) {
-        var callback = function() {
+    load_tw = function (f) {
+        var callback = function () {
             view.topic.dropdown({
-                topics: d3.range(my.m.n()).map(function(t) {
+                topics: d3.range(my.m.n()).map(function (t) {
                     return {
                         topic: t,
                         id: my.m.topic_id(t),
@@ -1279,7 +1307,7 @@ var dfb = function(spec) {
             return;
         }
 
-        load_data(f, function(error, tw_s) {
+        load_data(f, function (error, tw_s) {
             if (typeof tw_s === 'string') {
                 my.m.set_tw(tw_s);
                 callback();
@@ -1289,8 +1317,8 @@ var dfb = function(spec) {
         });
     };
 
-    load_topic_scaled = function(f) {
-        var callback = function() {
+    load_topic_scaled = function (f) {
+        var callback = function () {
             // if scaled missing, gray out the button for the view
             d3.select("#nav_model_scaled")
                 .classed("disabled", !my.m.topic_scaled())
@@ -1305,7 +1333,7 @@ var dfb = function(spec) {
             return;
         }
 
-        load_data(f, function(error, s) {
+        load_data(f, function (error, s) {
             if (typeof s === 'string') {
                 my.m.set_topic_scaled(s);
             } else {

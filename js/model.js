@@ -8,6 +8,7 @@ var model;
 // tw: array of d3.map()s keyed to words as strings
 // alpha: alpha values for topics
 // meta: object holding document citations
+// graph: object stored topic nodes & links 
 
 model = function (spec) {
     var my = spec || {}, // private members
@@ -257,8 +258,10 @@ model = function (spec) {
     };
     that.vocab = vocab;
 
+    
     // scaled coordinates for topics
     topic_scaled = function (t) {
+        
         if (!my.topic_scaled) {
             return undefined;
         }
@@ -267,11 +270,17 @@ model = function (spec) {
         if (t === undefined) {
             return my.topic_scaled;
         }
-
-        // topic_scaled(t) for coordinates for topic t
-        return my.topic_scaled[t];
+        else
+        {
+        
+            return undefined;
+        }
+        
     };
     that.topic_scaled = topic_scaled;
+    
+   
+    
 
     // get aggregate topic counts over some metadata category v
     conditional_total = function (v, key, callback) {
@@ -503,17 +512,19 @@ model = function (spec) {
 
     // load scaled topic coordinates from a string of CSV lines
     set_topic_scaled = function (ts_s) {
-        var s;
-        if (typeof ts_s === 'string') {
-            // strip blank "rows" at start or end
-            s = ts_s.replace(/^\n*/, "")
-                .replace(/\n*$/, "\n");
-            my.topic_scaled = d3.csv.parseRows(s, function (row) {
-                return row.map(parseFloat);
-            });
+
+        var graph;
+
+        if (typeof ts_s !== 'string') {
+            return;
         }
-        // consider the load complete even if there wasn't any data
+
+        graph = JSON.parse(ts_s);
+        my.topic_scaled = graph;
+        
         my.ready.topic_scaled = true;
+
+        
     };
     that.set_topic_scaled = set_topic_scaled;
 

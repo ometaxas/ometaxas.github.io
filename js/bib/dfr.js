@@ -10,7 +10,7 @@ bib.dfr = function (spec) {
     // Construction: override inherited sorting()
     that.sorting([
         ["year_authortitle", "by year, then by author"],
-        ["issue_journalcontents", "by journal issue"],
+        ["issue_journalcontents", "by journal name"],
         ["year_journalcontents", "by year, then by journal contents"],
         ["decade_date", "chronologically by decades"],
         ["decade_authortitle", "by decades, then by author"],

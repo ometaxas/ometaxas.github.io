@@ -84,14 +84,15 @@ Use "prepare-data info-stub" to create one.
 Use "prepare-data convert-citations" on DfR citations.tsv files.
 """)
 
-    print("Checking topic_scaled.csv...")
-    if "topic_scaled.csv" not in fs:
-        print("""No topic_scaled.csv found. This file is required only for the "scaled" overview.
+    print("Checking graph.json...")
+    if "graph.json" not in fs:
+        print("""No graph.json found. This file is required only for the "relations" overview.
 """
         )
     else:
-        print("topic.scaled.csv: ok")
+        print("graph.json: ok")
 
+    
     print("Checking tw.json...")
     if "tw.json" not in fs:
         print("""No tw.json found.
