@@ -22,7 +22,7 @@ view.model.relations = function (param) {
     var color = d3v5.scaleOrdinal(d3v5.schemeCategory10);
 
     var graph = param.graph;
-    //d3v5.json("graph.json").then(function (graph) {
+    
     if (graph) {
 
 
