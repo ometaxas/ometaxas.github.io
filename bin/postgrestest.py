@@ -192,7 +192,7 @@ def export_topicsilimarity(experimentid):
         
         query = ("""select topicid1, topicid2, similarity
 FROM topicsimilarity 
-WHERE experimentid1 = '{}' and similarity >= 0.3   order by topicid1, topicid2""").format(experimentid)
+WHERE experimentid1 = '{}' and similarity >= 0.2   order by topicid1, topicid2""").format(experimentid)
 
         cur.execute(query)
 
