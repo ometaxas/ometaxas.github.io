@@ -35,8 +35,8 @@ var VIS = {
     overview_words: 15,     // may need adjustment
     model_view: {
         plot: {
-            w: 500,            // px: the minimum svg width
-            aspect: 1.4, //.3333,     // for calculating height
+            w: 1000,            // px: the minimum svg width
+            aspect: 1.6, //.3333,     // for calculating height
             words: 6,           // maximum: may need adjustment
             size_range: [7, 18], // points. may need adjustment
             name_size: 18,      // points
@@ -47,12 +47,12 @@ var VIS = {
             // indents: [ 0.5, 0, 0.5 ] // AND/OR: x origin of each row
         },
         relations: {
-            w: 500,         // px: the minimum svg width
-            aspect: 1.333          
+            w: 1000,         // px: the minimum svg width
+            aspect: 1.6          
         },
         conditional: {
-            w: 500,         // px: the minimum svg width
-            aspect: 1.4,//333,
+            w: 1000,         // px: the minimum svg width
+            aspect: 1.6,//333,
             m: {
                 left: 20,
                 right: 20,
