@@ -30,15 +30,17 @@ def export_tw(experimentid):
                                   password = "postgres",
                                   host = "localhost",
                                   port = "5432",
-                                  database = "DBLP")
+                                  database = "Cord19")
         cur = connection.cursor()
         
         
         query = ("""select topicid, title, weight 
         from topic 
         inner join topicdetails on topic.id = topicdetails.topicid
-        where topic.experimentid = '{}' and visibilityindex>0  and itemtype=0 and topic.experimentid = topicdetails.experimentid
+        where topic.experimentid = '{}'   and itemtype=0 and topic.experimentid = topicdetails.experimentid
         order by topicid """).format(experimentid)
+        
+        #and visibilityindex>0
 
         cur.execute(query)
 
@@ -56,9 +58,22 @@ def export_tw(experimentid):
         tw = []
         cur = connection.cursor()
         
-        
         query = ("""select topicid,  replace(string_agg(concept, ','::text),' ','_') as concepts, string_agg(weightedcounts::text, ','::text)
-                 from topicanalysis_view_covid19 where experimentid = '{}' group by topicid  """).format(experimentid)
+                 from (SELECT a.topicid,
+    a.topicweight,
+    a.view,
+	a.view||':'||replace(a.concept,',',' ' ) as concept,
+	a.weightedcounts 				   
+    --string_agg( a.view||':'||a.concept, ','::text ORDER BY a.weightedcounts DESC) AS concepts
+   FROM topicanalysis_view a
+   
+   where a.experimentid = '{}' and a.itemtype in (1,2,-1,0)   
+   order by topicid, weightedcounts ) topicanalysis_view_covid19 
+   group by topicid """).format(experimentid)
+
+   #inner join topic on topic.id = a.topicid and visibilityindex>0 and a.experimentid = topic.experimentid     
+        #query = ("""select topicid,  replace(string_agg(concept, ','::text),' ','_') as concepts, string_agg(weightedcounts::text, ','::text)
+        #         from topicanalysis_view_covid19 where experimentid = '{}' group by topicid  """).format(experimentid)
 
         cur.execute(query)
 
@@ -117,7 +132,7 @@ def export_dt(experimentid):
                                   password = "postgres",
                                   host = "localhost",
                                   port = "5432",
-                                  database = "DBLP")
+                                  database = "Cord19")
         cur = connection.cursor()
         
         
@@ -186,7 +201,7 @@ def export_topicsilimarity(experimentid):
                                   password = "postgres",
                                   host = "localhost",
                                   port = "5432",
-                                  database = "DBLP")
+                                  database = "Cord19")
         cur = connection.cursor()
         
         
@@ -219,7 +234,7 @@ WHERE experimentid1 = '{}' and similarity >= 0.2   order by topicid1, topicid2""
         query = ("""select topicid, title, weight 
         from topic 
         inner join topicdetails on topic.id = topicdetails.topicid
-        where topic.experimentid = '{}' and visibilityindex>0  and itemtype=0 and topic.experimentid = topicdetails.experimentid
+        where topic.experimentid = '{}'  and itemtype=0 and topic.experimentid = topicdetails.experimentid
         order by topicid """).format(experimentid)
 
         cur.execute(query)
@@ -259,8 +274,8 @@ WHERE experimentid1 = '{}' and similarity >= 0.2   order by topicid1, topicid2""
 
 if __name__=="__main__":
     import sys
-    experimentid = 'Covid_55T_600IT_3000CHRs_3M_WVNoNet'
-    #export_tw(experimentid)
+    experimentid = 'Covid_100T_600IT_3000CHRs_6M_WVTwoWay'
+    export_tw(experimentid)
     #export_dt(experimentid)
-    export_topicsilimarity(experimentid)
+    #export_topicsilimarity(experimentid)
 
