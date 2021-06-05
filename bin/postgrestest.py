@@ -138,7 +138,7 @@ def export_dt(experimentid):
         
         query = ("""select distinct topicid, id, round(1000 * weight) as weight 
 from doc_topic 
-join covid19doc_view on doc_topic.docid = covid19doc_view.docid
+join covid19doc_mview on doc_topic.docid = covid19doc_mview.docid
 where experimentid = '{}' 
 order by topicid, id """).format(experimentid)
 
@@ -275,7 +275,7 @@ WHERE experimentid1 = '{}' and similarity >= 0.2   order by topicid1, topicid2""
 if __name__=="__main__":
     import sys
     experimentid = 'Covid_100T_600IT_3000CHRs_6M_WVTwoWay'
-    export_tw(experimentid)
-    #export_dt(experimentid)
+    #export_tw(experimentid)
+    export_dt(experimentid)
     #export_topicsilimarity(experimentid)
 
